@@ -1,4 +1,18 @@
 document.addEventListener("DOMContentLoaded", () => {
+    const loader = document.querySelector(".containerAnime");
+    const container = document.querySelector(".container");
+    const progress = document.querySelector(".progress");
+    const noise = document.querySelector(".noise");
+
+    // Sahifa to'liq yuklanganidan keyin 2 sekund davomida loaderni ko'rsatish
+    window.addEventListener("load", function () {
+        setTimeout(() => {
+            loader.style.display = "none"; // Loaderni yashirish
+            container.style.display = "block"; // Containerni ko'rsatish
+        }, 1000); // 2 sekund
+    });
+
+    // JSON faylini yuklash
     fetch("words.json")
         .then((response) => response.json())
         .then((flashcards) => {
@@ -19,12 +33,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 const sentenceDiv = document.createElement("div");
                 sentenceDiv.className = "sentence";
                 sentenceDiv.textContent =
-                    card.sentence || "No sentence available"; // Gap qo'shilgan bo'lishi kerak
+                    card.sentence || "No sentence available";
 
                 const sentenceTranslationDiv = document.createElement("div");
                 sentenceTranslationDiv.className = "sentence-translation";
                 sentenceTranslationDiv.textContent =
-                    card.sentence_translation || "No translation available"; // Tarjima qo'shilgan bo'lishi kerak
+                    card.sentence_translation || "No translation available";
 
                 const audioIcon = document.createElement("span");
                 audioIcon.className = "audio-icon";
@@ -54,12 +68,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // So'z va gapni o'qish funksiyasi
-function readAloud(text) {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "en-US";
-    speechSynthesis.speak(utterance);
-}
-
 function readAloud(text) {
     const utterance = new SpeechSynthesisUtterance(text);
     const voices = speechSynthesis.getVoices();
