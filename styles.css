@@ -1,0 +1,103 @@
+body {
+    font-family: "Roboto", sans-serif;
+    background-color: #e0f7fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+}
+
+.container {
+    text-align: center;
+    width: 100%;
+    max-width: 1200px;
+    height: 90vh;
+    overflow-y: auto;
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+h1 {
+    color: #00796b;
+    margin-bottom: 20px;
+    font-size: 2.5rem;
+}
+
+.flashcards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.flashcard {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 280px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.flashcard:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.flashcard .word {
+    font-size: 24px;
+    font-weight: bold;
+    color: #004d40;
+    margin-bottom: 10px;
+}
+
+.flashcard .definition {
+    font-size: 18px;
+    color: #00796b;
+    margin-bottom: 10px;
+}
+
+.flashcard .sentence {
+    font-size: 16px;
+    color: #004d40;
+    margin-bottom: 10px;
+    font-style: italic;
+}
+
+.flashcard .sentence-translation {
+    font-size: 16px;
+    color: #00796b;
+    margin-bottom: 10px;
+    font-style: italic;
+}
+
+.flashcard .audio-icon {
+    margin-top: 10px;
+    cursor: pointer;
+    font-size: 24px; /* Kattaroq ikonka */
+    color: #004d40;
+    transition: color 0.3s ease;
+}
+
+.flashcard .audio-icon:hover {
+    color: #00796b;
+}
+
+/* Chrome, Safari, and Edge */
+::-webkit-scrollbar {
+    display: none;
+}
+
+/* Firefox */
+.scroll-hidden {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
