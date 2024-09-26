@@ -1,71 +1,86 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const loader = document.querySelector(".containerAnime");
-    const container = document.querySelector(".container");
-    const progress = document.querySelector(".progress");
-    const noise = document.querySelector(".noise");
+let currentIndex = 0;
+const itemsPerLoad = 10;
+let totalItems = 0;
+const toggler = document.getElementById("toggle");
 
-    // Sahifa to'liq yuklanganidan keyin 2 sekund davomida loaderni ko'rsatish
-    window.addEventListener("load", function () {
-        setTimeout(() => {
-            loader.style.display = "none"; // Loaderni yashirish
-            container.style.display = "block"; // Containerni ko'rsatish
-        }, 1000); // 2 sekund
-    });
+function toggleDarkMode() {
+    document.body.classList.toggle("dark-mode");
 
-    // JSON faylini yuklash
+    const isDarkModeEnabled = document.body.classList.contains("dark-mode");
+    localStorage.setItem("darkmode", isDarkModeEnabled);
+}
+
+toggler.addEventListener("click", toggleDarkMode);
+
+window.addEventListener("load", () => {
+    const isDarkModeEnabled = localStorage.getItem("darkmode");
+
+    if (isDarkModeEnabled === "true") {
+        document.body.classList.add("dark-mode");
+    } else {
+        document.body.classList.remove("dark-mode");
+    }
+
     fetch("words.json")
         .then((response) => response.json())
-        .then((flashcards) => {
-            const flashcardsContainer = document.getElementById("flashcards");
+        .then((json) => {
+            totalItems = json.length;
+            loadMoreItems(json);
 
-            flashcards.forEach((card) => {
-                const flashcardDiv = document.createElement("div");
-                flashcardDiv.className = "flashcard";
-
-                const wordDiv = document.createElement("div");
-                wordDiv.className = "word";
-                wordDiv.textContent = card.word;
-
-                const definitionDiv = document.createElement("div");
-                definitionDiv.className = "definition";
-                definitionDiv.textContent = card.definition;
-
-                const sentenceDiv = document.createElement("div");
-                sentenceDiv.className = "sentence";
-                sentenceDiv.textContent =
-                    card.sentence || "No sentence available";
-
-                const sentenceTranslationDiv = document.createElement("div");
-                sentenceTranslationDiv.className = "sentence-translation";
-                sentenceTranslationDiv.textContent =
-                    card.sentence_translation || "No translation available";
-
-                const audioIcon = document.createElement("span");
-                audioIcon.className = "audio-icon";
-                audioIcon.textContent = "🔊";
-
-                flashcardDiv.appendChild(wordDiv);
-                flashcardDiv.appendChild(definitionDiv);
-                flashcardDiv.appendChild(sentenceDiv);
-                flashcardDiv.appendChild(sentenceTranslationDiv);
-                flashcardDiv.appendChild(audioIcon);
-
-                // Kartani bosganda so'zni o'qish
-                flashcardDiv.addEventListener("click", () => {
-                    readAloud(card.word); // So'zni o'qish
-                });
-
-                // Audio iconni bosganda gapni o'qish
-                audioIcon.addEventListener("click", (event) => {
-                    event.stopPropagation(); // Audio icon bosilganda karta o'qilmasin
-                    readAloud(card.sentence || card.word); // Gapni o'qish
-                });
-
-                flashcardsContainer.appendChild(flashcardDiv);
+            const container = document.querySelector(".container");
+            container.addEventListener("scroll", () => {
+                if (
+                    container.scrollTop + container.clientHeight >=
+                    container.scrollHeight - 50
+                ) {
+                    loadMoreItems(json);
+                }
             });
-        })
-        .catch((error) => console.error("Error loading words.json:", error));
+        });
 });
+
+function loadMoreItems(data) {
+    const flashcards = document.getElementById("flashcards");
+    const itemsToLoad = data.slice(currentIndex, currentIndex + itemsPerLoad);
+
+    itemsToLoad.forEach((item) => {
+        const flashcardHTML = `
+            <span class="flashcard">
+                <div class="word loading">${item.word}</div>
+                <div class="definition loading">${item.definition}</div>
+                <div class="sentence loading">${item.sentence}</div>
+                <div class="sentenceTR loading">${item.sentenceTR}</div>
+                <div class="audio-icon loading" data-word="${item.word}" data-sentence="${item.sentence}">🔊</div>
+            </span>
+        `;
+        flashcards.insertAdjacentHTML("beforeend", flashcardHTML);
+    });
+
+    setTimeout(() => {
+        document.querySelectorAll(".loading").forEach((el) => {
+            el.classList.remove("loading");
+        });
+    }, 1000);
+
+    currentIndex += itemsPerLoad;
+
+    // Event listener for flashcards and audio icons
+    document.querySelectorAll(".flashcard").forEach((flashcard) => {
+        flashcard.addEventListener("click", () => {
+            const word = flashcard.querySelector(".word").textContent;
+            readAloud(word); // Read the word aloud when clicking on the flashcard
+        });
+    });
+
+    document.querySelectorAll(".audio-icon").forEach((audioIcon) => {
+        audioIcon.addEventListener("click", (event) => {
+            event.stopPropagation(); // Prevent flashcard click event
+            const sentence = audioIcon.getAttribute("data-sentence");
+            const word = audioIcon.getAttribute("data-word");
+            readAloud(sentence || word); // Read the sentence or word aloud
+        });
+    });
+}
 
 // So'z va gapni o'qish funksiyasi
 function readAloud(text) {
