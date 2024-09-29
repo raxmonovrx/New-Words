@@ -1,6 +1,7 @@
 let currentIndex = 0;
 const itemsPerLoad = 10;
 let totalItems = 0;
+let voicesLoaded = false;
 const toggler = document.getElementById("toggle");
 
 function toggleDarkMode() {
@@ -20,6 +21,8 @@ window.addEventListener("load", () => {
     } else {
         document.body.classList.remove("dark-mode");
     }
+
+    loadVoicesOnce();
 
     fetch("words.json")
         .then((response) => response.json())
@@ -43,6 +46,8 @@ function loadMoreItems(data) {
     const flashcards = document.getElementById("flashcards");
     const itemsToLoad = data.slice(currentIndex, currentIndex + itemsPerLoad);
 
+    removeEventListeners();
+
     itemsToLoad.forEach((item) => {
         const flashcardHTML = `
             <span class="flashcard">
@@ -64,30 +69,13 @@ function loadMoreItems(data) {
 
     currentIndex += itemsPerLoad;
 
-    // Event listener for flashcards and audio icons
-    document.querySelectorAll(".flashcard").forEach((flashcard) => {
-        flashcard.addEventListener("click", () => {
-            const word = flashcard.querySelector(".word").textContent;
-            readAloud(word); // Read the word aloud when clicking on the flashcard
-        });
-    });
-
-    document.querySelectorAll(".audio-icon").forEach((audioIcon) => {
-        audioIcon.addEventListener("click", (event) => {
-            event.stopPropagation(); // Prevent flashcard click event
-            const sentence = audioIcon.getAttribute("data-sentence");
-            const word = audioIcon.getAttribute("data-word");
-            readAloud(sentence || word); // Read the sentence or word aloud
-        });
-    });
+    addEventListeners();
 }
 
-// So'z va gapni o'qish funksiyasi
 function readAloud(text) {
     const utterance = new SpeechSynthesisUtterance(text);
     const voices = speechSynthesis.getVoices();
 
-    // Google Translate ovoziga eng yaqin ovozni tanlash
     const selectedVoice = voices.find(
         (voice) =>
             voice.name.includes("Google") || voice.name.includes("English")
@@ -103,7 +91,42 @@ function readAloud(text) {
     speechSynthesis.speak(utterance);
 }
 
-// Ovozni yuklash (bir oz kutish kerak bo'lishi mumkin)
+function addEventListeners() {
+    document.querySelectorAll(".flashcard").forEach((flashcard) => {
+        flashcard.addEventListener("click", () => {
+            const word = flashcard.querySelector(".word").textContent;
+            readAloud(word);
+        });
+    });
+
+    document.querySelectorAll(".audio-icon").forEach((audioIcon) => {
+        audioIcon.addEventListener("click", (event) => {
+            event.stopPropagation();
+            const sentence = audioIcon.getAttribute("data-sentence");
+            const word = audioIcon.getAttribute("data-word");
+            readAloud(sentence || word);
+        });
+    });
+}
+
+function removeEventListeners() {
+    document.querySelectorAll(".flashcard").forEach((flashcard) => {
+        flashcard.replaceWith(flashcard.cloneNode(true));
+    });
+
+    document.querySelectorAll(".audio-icon").forEach((audioIcon) => {
+        audioIcon.replaceWith(audioIcon.cloneNode(true));
+    });
+}
+
+function loadVoicesOnce() {
+    if (!voicesLoaded) {
+        speechSynthesis.getVoices();
+        voicesLoaded = true;
+        console.log("Ovozlar bir marta yuklandi.");
+    }
+}
+
 speechSynthesis.onvoiceschanged = () => {
-    readAloud("Hello, this is a test voice!");
+    loadVoicesOnce();
 };

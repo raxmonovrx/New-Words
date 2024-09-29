@@ -18,11 +18,11 @@
         #656871 100%
     );
     --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-    --body-background: #2e3b4e; /* Ko'k-yashil rang */
-    --container-color: #3b4a61; /* Oq rang */
-    --word-color: #f1f1f1; /* Oq rang */
-    --tarjima-color: #a8d8e8; /* Oq rang */
-    --title-color: #e1f5fe; /* Yengil moviy rang */
+    --body-background: #2e3b4e; 
+    --container-color: #3b4a61;
+    --word-color: #f1f1f1; 
+    --tarjima-color: #a8d8e8; 
+    --title-color: #e1f5fe; 
 }
 
 * {
